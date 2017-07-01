@@ -61,12 +61,21 @@ public:
 	using Base::func;
 };
 
+/*利用浮点数的存储规则，1 8 23单精度 1 11 52双精度的符号位 指数阶码 小数位表示法求得绝对值*/
 float myfabs(float x)
 {
 	*(int*)&x = 0x7fffffff;
 	return x;
-}
+} /*三个非规格数
+  NAN 阶码全1 小数位不全为0
+  无穷大 阶码全1 小数位全0
+  无穷小 解码全0 小数位不全为0*/
 
+/*找出一组数中，和为给定值的数对*/
+/*先排序，后从前后往中间找
+
+
+*/
 void printPair(int* arr, size_t N, int sum)
 {
 	int count = 0;
@@ -74,14 +83,24 @@ void printPair(int* arr, size_t N, int sum)
 	std::sort(arr, arr + N);
 	int * left = arr;
 	int * right = arr + N - 1;
+	int rightTemp = 0;
+	int leftTemp = 0;
 	while (left < right)
 	{
 		tempSum = (*left) + (*right);
 		if ( tempSum == sum)
 		{
 			std::cout << ++count << ":" << *left << " " << *right << "\n";
-			++left;
-			--right;
+			rightTemp = *right;
+			leftTemp = *left;
+			while ((left < right) && (*right == rightTemp))  
+			{
+				--right;
+			}
+			while ((left < right) && (*left == leftTemp)) /*跳过相同的元素*/
+			{
+				++left;
+			}
 		}
 		else if (tempSum < sum)
 		{
@@ -114,6 +133,7 @@ struct D { // deleter
 };
 
 
+/*相邻相同的元素只保留一个*/
 template<typename T>
 void _unique(std::vector<T>& myvector)
 {
@@ -141,16 +161,9 @@ void _unique(std::vector<T>& myvector)
 
 int main()
 {
-	std::vector<int> myvector{1,1,1,1,1,1,1,1,1,1};
+	int a[] = {1, 2, 3, 4, 5, 6, 6,5,4,3,2,3,2,4,7,7,7,5 };
 
-	_unique(myvector);
-	
-	/*myvector.erase(std::unique(myvector.begin(), myvector.end()), myvector.end()); */
-
-	for (auto &i : myvector)
-	{
-		std::cout << i << "   ";
-	}
+	printPair(a, sizeof(a) / sizeof(int), 8);
 
 	system("pause");
 	return 0;
